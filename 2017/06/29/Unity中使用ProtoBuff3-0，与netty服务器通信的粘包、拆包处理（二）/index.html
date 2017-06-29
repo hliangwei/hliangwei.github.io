@@ -3,14 +3,23 @@
 <head>
   <meta charset="utf-8">
   
-  <title>桑麻小屋</title>
+  <title>Unity中使用ProtoBuff3-0，与netty服务器通信的粘包、拆包处理（二） | 桑麻小屋</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta property="og:type" content="website">
-<meta property="og:title" content="桑麻小屋">
-<meta property="og:url" content="http://yoursite.com/index.html">
+  <meta name="description" content="3. 建立与服务端通信连接，使用protobuff编码解码废话少说，先上代码，注释的也比较清晰了12345678910111213141516171819202122232425262728293031323334353637383940414243444546474849505152535455565758596061626364656667686970717273747576777879808">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Unity中使用ProtoBuff3-0，与netty服务器通信的粘包、拆包处理（二）">
+<meta property="og:url" content="http://yoursite.com/2017/06/29/Unity中使用ProtoBuff3-0，与netty服务器通信的粘包、拆包处理（二）/index.html">
 <meta property="og:site_name" content="桑麻小屋">
+<meta property="og:description" content="3. 建立与服务端通信连接，使用protobuff编码解码废话少说，先上代码，注释的也比较清晰了12345678910111213141516171819202122232425262728293031323334353637383940414243444546474849505152535455565758596061626364656667686970717273747576777879808">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1971025-684c05e4f583edf6.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1971025-af47df2c58a2bbcd.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1971025-ae8f64d01f9aabd2.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1971025-95e3c1be6aa53a08.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:updated_time" content="2017-06-29T08:40:57.182Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="桑麻小屋">
+<meta name="twitter:title" content="Unity中使用ProtoBuff3-0，与netty服务器通信的粘包、拆包处理（二）">
+<meta name="twitter:description" content="3. 建立与服务端通信连接，使用protobuff编码解码废话少说，先上代码，注释的也比较清晰了12345678910111213141516171819202122232425262728293031323334353637383940414243444546474849505152535455565758596061626364656667686970717273747576777879808">
+<meta name="twitter:image" content="http://upload-images.jianshu.io/upload_images/1971025-684c05e4f583edf6.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
   
     <link rel="alternate" href="/atom.xml" title="桑麻小屋" type="application/atom+xml">
   
@@ -59,9 +68,7 @@
   </div>
 </header>
       <div class="outer">
-        <section id="main">
-  
-    <article id="post-Unity中使用ProtoBuff3-0，与netty服务器通信的粘包、拆包处理（二）" class="article article-type-post" itemscope itemprop="blogPost">
+        <section id="main"><article id="post-Unity中使用ProtoBuff3-0，与netty服务器通信的粘包、拆包处理（二）" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2017/06/29/Unity中使用ProtoBuff3-0，与netty服务器通信的粘包、拆包处理（二）/" class="article-date">
   <time datetime="2017-06-29T05:47:00.000Z" itemprop="datePublished">2017-06-29</time>
@@ -74,8 +81,8 @@
       <header class="article-header">
         
   
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/06/29/Unity中使用ProtoBuff3-0，与netty服务器通信的粘包、拆包处理（二）/">Unity中使用ProtoBuff3-0，与netty服务器通信的粘包、拆包处理（二）</a>
+    <h1 class="article-title" itemprop="name">
+      Unity中使用ProtoBuff3-0，与netty服务器通信的粘包、拆包处理（二）
     </h1>
   
 
@@ -84,11 +91,17 @@
     <div class="article-entry" itemprop="articleBody">
       
         <h2 id="3-建立与服务端通信连接，使用protobuff编码解码"><a href="#3-建立与服务端通信连接，使用protobuff编码解码" class="headerlink" title="3. 建立与服务端通信连接，使用protobuff编码解码"></a>3. 建立与服务端通信连接，使用protobuff编码解码</h2><p>废话少说，先上代码，注释的也比较清晰了<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div><div class="line">92</div><div class="line">93</div><div class="line">94</div><div class="line">95</div><div class="line">96</div><div class="line">97</div><div class="line">98</div><div class="line">99</div><div class="line">100</div><div class="line">101</div><div class="line">102</div><div class="line">103</div><div class="line">104</div><div class="line">105</div><div class="line">106</div><div class="line">107</div><div class="line">108</div><div class="line">109</div><div class="line">110</div><div class="line">111</div><div class="line">112</div><div class="line">113</div><div class="line">114</div><div class="line">115</div><div class="line">116</div><div class="line">117</div><div class="line">118</div><div class="line">119</div><div class="line">120</div><div class="line">121</div><div class="line">122</div><div class="line">123</div><div class="line">124</div><div class="line">125</div><div class="line">126</div><div class="line">127</div><div class="line">128</div><div class="line">129</div><div class="line">130</div><div class="line">131</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">using</span> Google.Protobuf;</div><div class="line"><span class="keyword">using</span> Google.Protobuf.Examples.AddressBook;</div><div class="line"><span class="keyword">using</span> Google.Protobuf.WellKnownTypes;</div><div class="line"><span class="keyword">using</span> System;</div><div class="line"><span class="keyword">using</span> System.Net.Sockets;</div><div class="line"><span class="keyword">using</span> UnityEngine;</div><div class="line"></div><div class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">NewBehaviourScript</span> : <span class="title">MonoBehaviour</span> &#123;</div><div class="line"></div><div class="line">	<span class="comment">// Use this for initialization</span></div><div class="line">	<span class="function"><span class="keyword">void</span> <span class="title">Start</span> (<span class="params"></span>) </span>&#123;</div><div class="line"></div><div class="line">        StartConnect();</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    TcpClient tcpClient;                <span class="comment">// </span></div><div class="line">    <span class="keyword">byte</span>[] receive_buff;                <span class="comment">// 专门用来接收Socket里面的数据的</span></div><div class="line">    <span class="keyword">byte</span>[] data_buff;                   <span class="comment">// 用来存当前未处理的数据</span></div><div class="line"></div><div class="line">    CodedOutputStream outputStream;     <span class="comment">// 用来绑定SocketStream，方便把proto对象转换成字节流Stream输送给服务器</span></div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">void</span> <span class="title">StartConnect</span>(<span class="params"></span>)</span></div><div class="line">    &#123;</div><div class="line">        TcpClient client = <span class="keyword">new</span> TcpClient();</div><div class="line">        tcpClient = client;</div><div class="line"> </div><div class="line">        <span class="comment">//这里写上你自己服务器的ip和端口</span></div><div class="line">        client.Connect(<span class="string">"192.168.1.1"</span>, <span class="number">8800</span>);</div><div class="line">        </div><div class="line">        receive_buff = <span class="keyword">new</span> <span class="keyword">byte</span>[client.ReceiveBufferSize];</div><div class="line"></div><div class="line">        outputStream = <span class="keyword">new</span> CodedOutputStream(client.GetStream());</div><div class="line"></div><div class="line">        <span class="comment">// 监听一波服务器消息</span></div><div class="line">        client.GetStream().BeginRead(receive_buff, <span class="number">0</span>, client.ReceiveBufferSize, ReceiveMessage, <span class="literal">null</span>);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="keyword">int</span> nFalg = <span class="number">0</span>;        <span class="comment">// 这个变量主要是为了防止和服务端无休无止互发消息，测试代码</span></div><div class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Update</span> (<span class="params"></span>) </span>&#123;</div><div class="line"></div><div class="line">        <span class="comment">// 因为ReceiveMessage接收数据是异步的方式，不是在主线程，有些方法不能用，比如ToString，所以消息处理放在这里处理</span></div><div class="line">        <span class="comment">// 但主要是因为后面要加上消息广播，可以添加在这里</span></div><div class="line">        <span class="keyword">if</span> (data_buff != <span class="literal">null</span> &amp;&amp; ++nFalg &lt; <span class="number">5</span>)</div><div class="line">        &#123;</div><div class="line">            <span class="comment">// 把数据传给CodedInputStream计算本次包的长度</span></div><div class="line">            CodedInputStream inputStream = <span class="keyword">new</span> CodedInputStream(data_buff);</div><div class="line">            <span class="keyword">int</span> length = inputStream.ReadLength();</div><div class="line">            <span class="comment">// 计算"包长度"占用的字节数，后面取数据的时候扣掉这个字节数，就是真实数据长度</span></div><div class="line">            <span class="keyword">int</span> lengthLength = CodedOutputStream.ComputeLengthSize(length);</div><div class="line"></div><div class="line">            <span class="comment">// 当前数据足够解析一个包了</span></div><div class="line">            <span class="keyword">if</span> (length + lengthLength &lt;= data_buff.Length)</div><div class="line">            &#123;</div><div class="line">                <span class="keyword">byte</span>[] real_data = <span class="keyword">new</span> <span class="keyword">byte</span>[length];</div><div class="line">                <span class="comment">// 拷贝真实数据</span></div><div class="line">                Array.Copy(data_buff, lengthLength, real_data, <span class="number">0</span>, length);</div><div class="line"></div><div class="line">                <span class="comment">// 假设服务器给你发了个AddressBook</span></div><div class="line">                AddressBook ab = AddressBook.Parser.ParseFrom(real_data);</div><div class="line"></div><div class="line">                <span class="comment">// 把这个数据直接还给服务器，验证客户端发给服务器的情况</span></div><div class="line">                SendMsg(ab);</div><div class="line"></div><div class="line">                <span class="comment">// 数据刚刚好，没有多余的</span></div><div class="line">                <span class="keyword">if</span> (length + lengthLength == data_buff.Length)</div><div class="line">                &#123;</div><div class="line">                    data_buff = <span class="literal">null</span>;</div><div class="line">                &#125;</div><div class="line">                <span class="keyword">else</span></div><div class="line">                &#123;</div><div class="line">                    <span class="comment">// 数据有剩余，保存剩余数据，等下一个Update解析</span></div><div class="line">                    <span class="keyword">byte</span>[] t = <span class="keyword">new</span> <span class="keyword">byte</span>[data_buff.Length - length - lengthLength];</div><div class="line">                    Array.Copy(data_buff, lengthLength + length, t, <span class="number">0</span>, t.Length);</div><div class="line">                    data_buff = t;</div><div class="line">                &#125;</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">	&#125;</div><div class="line"></div><div class="line">    <span class="comment">// 发送数据</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">SendMsg</span>(<span class="params">IMessage message</span>)</span></div><div class="line">    &#123;</div><div class="line">        <span class="keyword">if</span> (outputStream != <span class="literal">null</span>)</div><div class="line">        &#123;</div><div class="line">            <span class="comment">// WriteMessage 里面会先write一个长度，然后再write真实数据</span></div><div class="line">            outputStream.WriteMessage(message);</div><div class="line">            outputStream.Flush();       <span class="comment">// 把buffer数据写入到tcpClient的流里面</span></div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">ReceiveMessage</span>(<span class="params">IAsyncResult ar</span>)</span></div><div class="line">    &#123;</div><div class="line">        <span class="keyword">try</span></div><div class="line">        &#123;</div><div class="line">            <span class="comment">// 本次接收到的数据长度</span></div><div class="line">            <span class="keyword">int</span> bytesRead = tcpClient.GetStream().EndRead(ar);</div><div class="line">            <span class="keyword">if</span> (bytesRead &lt; <span class="number">1</span>)</div><div class="line">            &#123;</div><div class="line">                Debug.LogError(<span class="string">"bytesRead &lt; 1"</span>);</div><div class="line">                <span class="keyword">return</span>;</div><div class="line">            &#125;</div><div class="line">            <span class="keyword">else</span></div><div class="line">            &#123;</div><div class="line">                <span class="keyword">if</span> (data_buff == <span class="literal">null</span>)</div><div class="line">                &#123;</div><div class="line">                    <span class="comment">// buff里面没有数据</span></div><div class="line">                    data_buff = <span class="keyword">new</span> <span class="keyword">byte</span>[bytesRead];</div><div class="line">                    Array.Copy(receive_buff, data_buff, bytesRead);</div><div class="line">                &#125;</div><div class="line">                <span class="keyword">else</span></div><div class="line">                &#123;</div><div class="line">                    <span class="comment">// buff里面有数据，要和新数据整合起来</span></div><div class="line">                    <span class="keyword">byte</span>[] new_data = <span class="keyword">new</span> <span class="keyword">byte</span>[bytesRead + data_buff.Length];</div><div class="line">                    Array.Copy(data_buff, new_data, data_buff.Length);</div><div class="line"></div><div class="line">                    Array.Copy(receive_buff, <span class="number">0</span>, new_data, data_buff.Length, bytesRead);</div><div class="line"></div><div class="line">                    data_buff = new_data;</div><div class="line">                &#125;</div><div class="line">            &#125;</div><div class="line"></div><div class="line">            <span class="comment">// 继续监听下一波数据</span></div><div class="line">            tcpClient.GetStream().BeginRead(receive_buff, <span class="number">0</span>, tcpClient.ReceiveBufferSize, ReceiveMessage, <span class="literal">null</span>);</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">catch</span> (Exception ex)</div><div class="line">        &#123;</div><div class="line">            <span class="comment">// 为了防止报ex没被使用的警告</span></div><div class="line">            Debug.Log(ex);</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-        
-          <p class="article-more-link">
-            <a href="/2017/06/29/Unity中使用ProtoBuff3-0，与netty服务器通信的粘包、拆包处理（二）/#more">Read More</a>
-          </p>
-        
+<a id="more"></a>
+<h2 id="4-处理与Netty服务器通信的粘包、拆包"><a href="#4-处理与Netty服务器通信的粘包、拆包" class="headerlink" title="4. 处理与Netty服务器通信的粘包、拆包"></a>4. 处理与Netty服务器通信的粘包、拆包</h2><p>服务器的粘包拆包是Netty本身支持的解码编码器，如下图<br><img src="http://upload-images.jianshu.io/upload_images/1971025-684c05e4f583edf6.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="服务器粘包、拆包处理方式"><br>总共四行，其中第一行作用在拆包的时候，第三行作用在粘包的时候（我猜的）。<br>它这个拆包粘包不是普通的那种固定4个字节标示长度的，而是有时候1个字节，有时候是2、3、4、5个字节，根据当前发送的真实数据的长度定的。<br>    在普通的方案粘包方案，数据是这样的：4个字节+真实数据<br>    有的是用换行回车作为标识符拆包、粘包</p>
+<p>那在Netty的方案里，包长度究竟是几个字节呢？<br>其实它也是用到了Protobuff里面的数据读取、保存方式，感兴趣的可以打开<code>protobuf3-for-unity-3.0.0\src\Google.Protobuf.sln</code>工程看一下，在<code>Google.Protobuf</code>项目中，打开<code>CodedInputStream.cs</code>：<br><img src="http://upload-images.jianshu.io/upload_images/1971025-af47df2c58a2bbcd.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="SlowReadRawVarint32"><br>包头占用几个字节是由下面这个函数计算的：<br><img src="http://upload-images.jianshu.io/upload_images/1971025-ae8f64d01f9aabd2.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="这个是计算一个uint数据的真实长度的方法"><br>这也是protobuff对象编码后数据会比较小的主要原因。比如一个对象编码后得到的是440个字节数据，那么调用<code>ComputeRawVarint32Size(440)</code>的返回值是2，也就是服务器和客户端发送的数据最终长度是440+2=442个字节。明白了这些，拆包和粘包就都不是问题了。</p>
+<p>上面的代码里，粘包是这一段：<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">SendMsg</span>(<span class="params">IMessage message</span>)</span></div><div class="line">    &#123;</div><div class="line">        <span class="keyword">if</span> (outputStream != <span class="literal">null</span>)</div><div class="line">        &#123;</div><div class="line">            <span class="comment">// WriteMessage 里面会先write一个长度，然后再write真实数据</span></div><div class="line">            outputStream.WriteMessage(message);</div><div class="line">            outputStream.Flush();       <span class="comment">// 把buffer数据写入到tcpClient的流里面</span></div><div class="line">        &#125;</div><div class="line">    &#125;</div></pre></td></tr></table></figure></p>
+<p>乍一看，好像没有在真实数据前面加长度啊？其实，在outputStream的WriteMessage里面已经有WriteLength了，帮我们做好了。</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/1971025-95e3c1be6aa53a08.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="image.png"></p>
+<p>再看拆包：<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 把数据传给CodedInputStream计算本次包的长度</span></div><div class="line">CodedInputStream inputStream = <span class="keyword">new</span> CodedInputStream(data_buff);</div><div class="line"><span class="keyword">int</span> length = inputStream.ReadLength();</div><div class="line"><span class="comment">// 计算"包长度"占用的字节数，后面取数据的时候扣掉这个字节数，就是真实数据长度</span></div><div class="line"><span class="keyword">int</span> lengthLength = CodedOutputStream.ComputeLengthSize(length);</div><div class="line"></div><div class="line"><span class="comment">// 当前数据足够解析一个包了</span></div><div class="line"><span class="keyword">if</span> (length + lengthLength &lt;= data_buff.Length)</div><div class="line">&#123;</div><div class="line">    <span class="keyword">byte</span>[] real_data = <span class="keyword">new</span> <span class="keyword">byte</span>[length];</div><div class="line">    <span class="comment">// 拷贝真实数据</span></div><div class="line">    Array.Copy(data_buff, lengthLength, real_data, <span class="number">0</span>, length);</div><div class="line"></div><div class="line">    <span class="comment">// 假设服务器给你发了个AddressBook</span></div><div class="line">    AddressBook ab = AddressBook.Parser.ParseFrom(real_data);</div><div class="line">    ...</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>先用CodedInputStream 看看这个“包大小”值是多少，再用CodedOutputStream.ComputeLengthSize计算这个“包大小”占几个字节，然后就明白真实数据从哪里开始，占多少字节了。</p>
+<h2 id="结束语"><a href="#结束语" class="headerlink" title="结束语"></a>结束语</h2><p>测试并不是非常非常充分，仅供参考。</p>
+<p>参考：<a href="http://blog.csdn.net/u010841296/article/details/50957471?locationNum=2&amp;fps=1" title="netty:protobuf的编码器ProtobufVarint32LengthFieldPrepender()、解码器ProtobufVarint32FrameDecoder()" target="_blank" rel="external">http://blog.csdn.net/u010841296/article/details/50957471?locationNum=2&amp;fps=1</a></p>
+
       
     </div>
     <footer class="article-footer">
@@ -98,176 +111,19 @@
     </footer>
   </div>
   
-</article>
-
-
+    
+<nav id="article-nav">
   
-    <article id="post-Unity中使用ProtoBuff3-0，与netty服务器通信的粘包、拆包处理（一）" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2017/06/29/Unity中使用ProtoBuff3-0，与netty服务器通信的粘包、拆包处理（一）/" class="article-date">
-  <time datetime="2017-06-29T05:37:00.000Z" itemprop="datePublished">2017-06-29</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
   
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/06/29/Unity中使用ProtoBuff3-0，与netty服务器通信的粘包、拆包处理（一）/">Unity中使用ProtoBuff3-0，与netty服务器通信的粘包、拆包处理（一）</a>
-    </h1>
+    <a href="/2017/06/29/Unity中使用ProtoBuff3-0，与netty服务器通信的粘包、拆包处理（一）/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">Unity中使用ProtoBuff3-0，与netty服务器通信的粘包、拆包处理（一）</div>
+    </a>
   
+</nav>
 
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>[TOC]</p>
-<h2 id="1-Unity-protobuff3-0库的选择"><a href="#1-Unity-protobuff3-0库的选择" class="headerlink" title="1. Unity protobuff3.0库的选择"></a>1. Unity protobuff3.0库的选择</h2><p>网上搜查发现，目前可供unity使用的protobuff3.0的库主要有2个，一个是<br><a href="https://github.com/mgravell/protobuf-net" target="_blank" rel="external">protobuf-net</a>，另一个是<br><a href="https://github.com/bitcraftCoLtd/protobuf3-for-unity" title="protobuf3-for-unity" target="_blank" rel="external">protobuf3-for-unity</a>，选择哪一个呢？</p>
-<ul>
-<li>从github上的Star数量来看：protobuf-net的1400+远胜于protobuf3-for-unity的136</li>
-<li>从更新日期来看，protobuf-net最近几天都有post，而protobuf3-for-unity最近的动作则是在十个月之前了。</li>
-</ul>
-<p>但是为什么最终选择了protobuf3-for-unity？因为我使用Nuget :<br><code>Install-Package protobuf-net</code></p>
-<p>安装protobuf-net一直不成功，报错说指令集不兼容，我们知道，unity支持的.net版本是2.0和3.5，protobuf-net最新支持的是.NET Framework 4.0+的，没法用，官网上说v2.1.0的版本支持.NET Framework 2.0/3.0/3.5，于是安装命令改成：<br><code>Install-Package protobuf-net -version 2.1.0</code></p>
-<p>还是报一样的错误：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line">Install-Package protobuf-net</div><div class="line"></div><div class="line">正在尝试收集与目标为“.NETFramework,Version=v3.5,Profile=Unity Subset v3.5”的项目“TestMj”有关的&gt;包“protobuf-net.2.2.1”的依赖项信息</div><div class="line">收集依赖项信息花费时间 1.11 ms</div><div class="line">正在尝试解析程序包“protobuf-net.2.2.1”的依赖项，DependencyBehavior 为“Lowest”</div><div class="line">解析依赖项信息花费时间 0 ms</div><div class="line">正在解析操作以安装程序包“protobuf-net.2.2.1”</div><div class="line">已解析操作以安装程序包“protobuf-net.2.2.1”</div><div class="line">从“nuget.org”检索包“protobuf-net 2.2.1” </div><div class="line">  GET https://api.nuget.org/packages/protobuf-net.2.2.1.nupkg</div><div class="line">  OK https://api.nuget.org/packages/protobuf-net.2.2.1.nupkg 69 毫秒</div><div class="line">正在安装 protobuf-net 2.2.1。</div><div class="line">安装失败。正在回滚...</div><div class="line">程序包“protobuf-net.2.2.1”不存在于项目“TestMj”中</div><div class="line">程序包“protobuf-net.2.2.1”不存在于文件夹“C:\Users\IGG\AppData\Local\Temp\TestMj\packages”中</div><div class="line">执行 nuget 操作花费时间 701.07 ms</div><div class="line">Install-Package : 无法安装程序包“protobuf-net 2.2.1”。你正在尝试将此程序包安装到目标为“.NETFramework,Version=v3.5,Profile=Unity Subset v3.5”的项目中，但该程序包不包含任何与该框架兼容的程序集引用或内容文件。有关详细信息，请联系程序包作者。</div><div class="line">所在位置 行:1 字符: 16</div><div class="line">+ Install-Package &lt;&lt;&lt;&lt;  protobuf-net</div><div class="line">    + CategoryInfo          : NotSpecified: (:) [Install-Package], Exception</div><div class="line">    + FullyQualifiedErrorId : NuGetCmdletUnhandledException,NuGet.PackageManagement.PowerShellCmdlets.InstallPackageCommand</div><div class="line"></div><div class="line">已用时间: 00:00:01.6763018</div></pre></td></tr></table></figure></p>
-<p>参考这个最新版的<a href="https://mgravell.github.io/protobuf-net/releasenotes" target="_blank" rel="external">release note</a>里面，好像是有针对这个问题做修复，但是我试了<code>Install-Package protobuf-net -version 2.3.0-alpha</code>没效果，不知道是不是用法不对，不想继续浪费时间，就果断选择protobuf3-for-unity。等下次闲了再去试试。</p>
-<h4 id="v2-3-0-alpha"><a href="#v2-3-0-alpha" class="headerlink" title="v2.3.0-alpha"></a><a href="https://mgravell.github.io/protobuf-net/releasenotes#v230-alpha" target="_blank" rel="external">v2.3.0-alpha</a></h4><p><code>net20 / net35 targets reinstated for NuGet build (#262)</code></p>
-        
-          <p class="article-more-link">
-            <a href="/2017/06/29/Unity中使用ProtoBuff3-0，与netty服务器通信的粘包、拆包处理（一）/#more">Read More</a>
-          </p>
-        
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/06/29/Unity中使用ProtoBuff3-0，与netty服务器通信的粘包、拆包处理（一）/" data-id="cj4i4iuww000020chu5r7ay93" class="article-share-link">Share</a>
-      
-      
-    </footer>
-  </div>
   
 </article>
-
-
-  
-    <article id="post-晚上" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2017/06/21/晚上/" class="article-date">
-  <time datetime="2017-06-21T05:37:00.000Z" itemprop="datePublished">2017-06-21</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/06/21/晚上/">晚上</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>今天晚上，何金piao和nick和二爷带妲己上王者，再来一个五排</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/06/21/晚上/" data-id="cj46rh8l30000p8ch9h9i8iqv" class="article-share-link">Share</a>
-      
-      
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-C++中lambada变量捕获方式" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2017/06/21/C++中lambada变量捕获方式/" class="article-date">
-  <time datetime="2017-06-21T03:27:03.000Z" itemprop="datePublished">2017-06-21</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/06/21/C++中lambada变量捕获方式/">C++ lambada 变量捕获的几种方式</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p><code>* [a,&amp;b] a变量以值的方式呗捕获，b以引用的方式被捕获。</code><br><code>* [this] 以值的方式捕获 this 指针。</code><br><code>* [&amp;] 以引用的方式捕获所有的外部自动变量。</code><br><code>* [=] 以值的方式捕获所有的外部自动变量。</code><br><code>* [] 不捕获外部的任何变量。</code></p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/06/21/C++中lambada变量捕获方式/" data-id="cj46rh8l80001p8chhc7my2tq" class="article-share-link">Share</a>
-      
-      
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-这是第一篇" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2017/06/21/这是第一篇/" class="article-date">
-  <time datetime="2017-06-21T01:52:17.000Z" itemprop="datePublished">2017-06-21</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/06/21/这是第一篇/">欢迎</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>这是一个欢迎页面，本站正在规划中…<br>过几天再来看看</p>
-        
-          <p class="article-more-link">
-            <a href="/2017/06/21/这是第一篇/#more">Read More</a>
-          </p>
-        
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/06/21/这是第一篇/" data-id="cj46rh8lj0002p8ch9fblwiv6" class="article-share-link">Share</a>
-      
-      
-    </footer>
-  </div>
-  
-</article>
-
-
-  
 
 </section>
         

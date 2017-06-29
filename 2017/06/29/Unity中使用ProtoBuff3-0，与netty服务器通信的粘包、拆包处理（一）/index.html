@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Unity中使用ProtoBuff3-0，与netty服务器通信的粘包、拆包处理（一） | 桑麻小屋</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="[TOC] 1. Unity protobuff3.0库的选择网上搜查发现，目前可供unity使用的protobuff3.0的库主要有2个，一个是protobuf-net，另一个是protobuf3-for-unity，选择哪一个呢？  从github上的Star数量来看：protobuf-net的1400+远胜于protobuf3-for-unity的136 从更新日期来看，protobuf-n">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Unity中使用ProtoBuff3-0，与netty服务器通信的粘包、拆包处理（一）">
+<meta property="og:url" content="http://yoursite.com/2017/06/29/Unity中使用ProtoBuff3-0，与netty服务器通信的粘包、拆包处理（一）/index.html">
+<meta property="og:site_name" content="桑麻小屋">
+<meta property="og:description" content="[TOC] 1. Unity protobuff3.0库的选择网上搜查发现，目前可供unity使用的protobuff3.0的库主要有2个，一个是protobuf-net，另一个是protobuf3-for-unity，选择哪一个呢？  从github上的Star数量来看：protobuf-net的1400+远胜于protobuf3-for-unity的136 从更新日期来看，protobuf-n">
+<meta property="og:updated_time" content="2017-06-29T08:39:01.999Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Unity中使用ProtoBuff3-0，与netty服务器通信的粘包、拆包处理（一）">
+<meta name="twitter:description" content="[TOC] 1. Unity protobuff3.0库的选择网上搜查发现，目前可供unity使用的protobuff3.0的库主要有2个，一个是protobuf-net，另一个是protobuf3-for-unity，选择哪一个呢？  从github上的Star数量来看：protobuf-net的1400+远胜于protobuf3-for-unity的136 从更新日期来看，protobuf-n">
+  
+    <link rel="alternate" href="/atom.xml" title="桑麻小屋" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">桑麻小屋</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-Unity中使用ProtoBuff3-0，与netty服务器通信的粘包、拆包处理（一）" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/06/29/Unity中使用ProtoBuff3-0，与netty服务器通信的粘包、拆包处理（一）/" class="article-date">
+  <time datetime="2017-06-29T05:37:00.000Z" itemprop="datePublished">2017-06-29</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Unity中使用ProtoBuff3-0，与netty服务器通信的粘包、拆包处理（一）
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>[TOC]</p>
+<h2 id="1-Unity-protobuff3-0库的选择"><a href="#1-Unity-protobuff3-0库的选择" class="headerlink" title="1. Unity protobuff3.0库的选择"></a>1. Unity protobuff3.0库的选择</h2><p>网上搜查发现，目前可供unity使用的protobuff3.0的库主要有2个，一个是<br><a href="https://github.com/mgravell/protobuf-net" target="_blank" rel="external">protobuf-net</a>，另一个是<br><a href="https://github.com/bitcraftCoLtd/protobuf3-for-unity" title="protobuf3-for-unity" target="_blank" rel="external">protobuf3-for-unity</a>，选择哪一个呢？</p>
+<ul>
+<li>从github上的Star数量来看：protobuf-net的1400+远胜于protobuf3-for-unity的136</li>
+<li>从更新日期来看，protobuf-net最近几天都有post，而protobuf3-for-unity最近的动作则是在十个月之前了。</li>
+</ul>
+<p>但是为什么最终选择了protobuf3-for-unity？因为我使用Nuget :<br><code>Install-Package protobuf-net</code></p>
+<p>安装protobuf-net一直不成功，报错说指令集不兼容，我们知道，unity支持的.net版本是2.0和3.5，protobuf-net最新支持的是.NET Framework 4.0+的，没法用，官网上说v2.1.0的版本支持.NET Framework 2.0/3.0/3.5，于是安装命令改成：<br><code>Install-Package protobuf-net -version 2.1.0</code></p>
+<p>还是报一样的错误：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line">Install-Package protobuf-net</div><div class="line"></div><div class="line">正在尝试收集与目标为“.NETFramework,Version=v3.5,Profile=Unity Subset v3.5”的项目“TestMj”有关的&gt;包“protobuf-net.2.2.1”的依赖项信息</div><div class="line">收集依赖项信息花费时间 1.11 ms</div><div class="line">正在尝试解析程序包“protobuf-net.2.2.1”的依赖项，DependencyBehavior 为“Lowest”</div><div class="line">解析依赖项信息花费时间 0 ms</div><div class="line">正在解析操作以安装程序包“protobuf-net.2.2.1”</div><div class="line">已解析操作以安装程序包“protobuf-net.2.2.1”</div><div class="line">从“nuget.org”检索包“protobuf-net 2.2.1” </div><div class="line">  GET https://api.nuget.org/packages/protobuf-net.2.2.1.nupkg</div><div class="line">  OK https://api.nuget.org/packages/protobuf-net.2.2.1.nupkg 69 毫秒</div><div class="line">正在安装 protobuf-net 2.2.1。</div><div class="line">安装失败。正在回滚...</div><div class="line">程序包“protobuf-net.2.2.1”不存在于项目“TestMj”中</div><div class="line">程序包“protobuf-net.2.2.1”不存在于文件夹“C:\Users\IGG\AppData\Local\Temp\TestMj\packages”中</div><div class="line">执行 nuget 操作花费时间 701.07 ms</div><div class="line">Install-Package : 无法安装程序包“protobuf-net 2.2.1”。你正在尝试将此程序包安装到目标为“.NETFramework,Version=v3.5,Profile=Unity Subset v3.5”的项目中，但该程序包不包含任何与该框架兼容的程序集引用或内容文件。有关详细信息，请联系程序包作者。</div><div class="line">所在位置 行:1 字符: 16</div><div class="line">+ Install-Package &lt;&lt;&lt;&lt;  protobuf-net</div><div class="line">    + CategoryInfo          : NotSpecified: (:) [Install-Package], Exception</div><div class="line">    + FullyQualifiedErrorId : NuGetCmdletUnhandledException,NuGet.PackageManagement.PowerShellCmdlets.InstallPackageCommand</div><div class="line"></div><div class="line">已用时间: 00:00:01.6763018</div></pre></td></tr></table></figure></p>
+<p>参考这个最新版的<a href="https://mgravell.github.io/protobuf-net/releasenotes" target="_blank" rel="external">release note</a>里面，好像是有针对这个问题做修复，但是我试了<code>Install-Package protobuf-net -version 2.3.0-alpha</code>没效果，不知道是不是用法不对，不想继续浪费时间，就果断选择protobuf3-for-unity。等下次闲了再去试试。</p>
+<h4 id="v2-3-0-alpha"><a href="#v2-3-0-alpha" class="headerlink" title="v2.3.0-alpha"></a><a href="https://mgravell.github.io/protobuf-net/releasenotes#v230-alpha" target="_blank" rel="external">v2.3.0-alpha</a></h4><p><code>net20 / net35 targets reinstated for NuGet build (#262)</code></p>
+<a id="more"></a>
+<h2 id="2-Unity-protobuff3-0整合及测试"><a href="#2-Unity-protobuff3-0整合及测试" class="headerlink" title="2. Unity protobuff3.0整合及测试"></a>2. Unity protobuff3.0整合及测试</h2><p>整合：</p>
+<ol>
+<li>新建一个unity3d项目</li>
+<li>下载<a href="https://github.com/bitcraftCoLtd/protobuf3-for-unity" title="protobuf3-for-unity" target="_blank" rel="external">protobuf3-for-unity</a>，解压。</li>
+<li>根据项目首页readme.md的指示，安装对应版本的.NET Core</li>
+<li>双击解压后的得到的build_packages.bat，进行编译，如果编译失败，一定是.Net Core版本选择错了，卸载掉原来的重新下载一个安装再试。</li>
+<li>编译成功的话，protobuf3-for-unity-3.0.0\src\Google.Protobuf\bin\Release\net35目录下会有一个Google.Protobuf.dll，这个dll就是我们要用在unity项目里面的。如果自己编译不出来，也可以在<a href="https://github.com/bitcraftCoLtd/protobuf3-for-unity/releases/download/v3.0.0_ga_noJIT/protobuf3-for-unity-v3.0.0_ga_noJIT.zip" target="_blank" rel="external">这里</a>直接下载，解压里面就有一个作者编好的dll。</li>
+<li>把上面的dll拷贝到unity项目的Assets\Plugins\目录下。如果没有Plugins目录，自己创建一个。</li>
+</ol>
+<p><code>注：protobuf3-for-unity-3.0.0\src\Google.Protobuf工程源码可以看看，有助于了解protobuff3.0的实现。</code></p>
+<p>测试：</p>
+<ul>
+<li>在测试之前，还需要下载一个<a href="https://github.com/google/protobuf/releases?after=v3.1.0" target="_blank" rel="external">protoc</a>，也就是代码生成器，用来把我们定义的proto文件生成C#对应的类，我们是protobuff3.0版本，要选对版本、选对系统，我是win7系统，所以是下载<a href="https://github.com/google/protobuf/releases/download/v3.0.0/protoc-3.0.0-win32.zip" target="_blank" rel="external">这个protoc-3.0.0-win32.zip</a>，注意需要的是protoc，不需要把源代码下载下来。源代码在上面下载的<a href="https://github.com/bitcraftCoLtd/protobuf3-for-unity" target="_blank" rel="external">protobuf3-for-unity</a>里面已经有了。解压后在protoc-3.0.0-win32\bin目录下能看到一个protoc.exe</li>
+<li>把下面代码保存成addressbook.proto文件放在protoc.exe同级目录下</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line">syntax = &quot;proto3&quot;;</div><div class="line">package tutorial;</div><div class="line"></div><div class="line">message Person &#123;</div><div class="line">  string name = 1;</div><div class="line">  int32 id = 2;  // Unique ID number for this person.</div><div class="line">  string email = 3;</div><div class="line"></div><div class="line">  enum PhoneType &#123;</div><div class="line">	MOBILE = 0;</div><div class="line">	HOME = 1;</div><div class="line">	WORK = 2;</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  message PhoneNumber &#123;</div><div class="line">	string number = 1;</div><div class="line">	PhoneType type = 2;</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  repeated PhoneNumber phones = 4;</div><div class="line">&#125;</div><div class="line"></div><div class="line">// Our address book file is just one of these.</div><div class="line">message AddressBook &#123;</div><div class="line">  repeated Person people = 1;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<ul>
+<li>打开一个cmd窗口，cd到protoc.exe所在目录，输入 <code>protoc --csharp_out=./ addressbook.proto</code> 然后回车，可以看到，同级目录下生成了一个Addressbook.cs文件，这个文件需要加在unity3d工程的Assets\Scripts目录下，不放在Scripts目录下应该也没影响。</li>
+<li>新建一个C#脚本，挂在场景任意一个物体上，只要启动的时候能触发这个脚本的调用就可以了。</li>
+<li>在新建的脚本的Start函数里写上测试代码：</li>
+</ul>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 我的全部using是这些，因为已经添加了网络部分的，虽然到这一步还没用到</span></div><div class="line"><span class="keyword">using</span> Google.Protobuf;</div><div class="line"><span class="keyword">using</span> Google.Protobuf.Examples.AddressBook;</div><div class="line"><span class="keyword">using</span> Google.Protobuf.WellKnownTypes;</div><div class="line"><span class="keyword">using</span> System;</div><div class="line"><span class="keyword">using</span> System.IO;</div><div class="line"><span class="keyword">using</span> System.Net.Sockets;</div><div class="line"><span class="keyword">using</span> UnityEngine;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">Start</span> (<span class="params"></span>) </span>&#123;</div><div class="line">        <span class="comment">// 这些代码是在protobuf3-for-unity-3.0.0\src\AddressBook\Program.cs里面拷贝的</span></div><div class="line">        <span class="keyword">byte</span>[] bytes;</div><div class="line">        <span class="comment">// Create a new person</span></div><div class="line">        Person person = <span class="keyword">new</span> Person</div><div class="line">        &#123;</div><div class="line">            Id = <span class="number">1</span>,</div><div class="line">            Name = <span class="string">"Foo"</span>,</div><div class="line">            Email = <span class="string">"foo@bar"</span>,</div><div class="line">            Phones = &#123; <span class="keyword">new</span> Person.Types.PhoneNumber &#123; Number = <span class="string">"555-1212"</span> &#125; &#125;</div><div class="line">        &#125;;</div><div class="line">        <span class="keyword">using</span> (MemoryStream stream = <span class="keyword">new</span> MemoryStream())</div><div class="line">        &#123;</div><div class="line">            <span class="comment">// Save the person to a stream</span></div><div class="line">            person.WriteTo(stream);</div><div class="line">            bytes = stream.ToArray();</div><div class="line">        &#125;</div><div class="line">        Person copy = Person.Parser.ParseFrom(bytes);</div><div class="line"></div><div class="line">        AddressBook book = <span class="keyword">new</span> AddressBook</div><div class="line">        &#123;</div><div class="line">            People = &#123; copy &#125;</div><div class="line">        &#125;;</div><div class="line">        bytes = book.ToByteArray();</div><div class="line">        <span class="comment">// And read the address book back again</span></div><div class="line">        AddressBook restored = AddressBook.Parser.ParseFrom(bytes);</div><div class="line">        <span class="comment">// The message performs a deep-comparison on equality:</span></div><div class="line">        <span class="keyword">if</span> (restored.People.Count != <span class="number">1</span> || !person.Equals(restored.People[<span class="number">0</span>]))</div><div class="line">        &#123;</div><div class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> Exception(<span class="string">"There is a bad person in here!"</span>);</div><div class="line">        &#125;</div><div class="line">    &#125;</div></pre></td></tr></table></figure>
+<ul>
+<li>添加完以上代码，在ide里打个断点，unity里面点启动，一步步断点跟下来可以查看究竟。</li>
+</ul>
+<h2 id="3-建立与服务端通信连接，使用protobuff编码解码"><a href="#3-建立与服务端通信连接，使用protobuff编码解码" class="headerlink" title="3. 建立与服务端通信连接，使用protobuff编码解码"></a>3. 建立与服务端通信连接，使用protobuff编码解码</h2><h2 id="4-处理与Netty服务器通信的粘包、拆包"><a href="#4-处理与Netty服务器通信的粘包、拆包" class="headerlink" title="4. 处理与Netty服务器通信的粘包、拆包"></a>4. 处理与Netty服务器通信的粘包、拆包</h2><p>先去吃饭，3和4部分放在<a href="http://www.jianshu.com/p/797b40a97c98" target="_blank" rel="external">下一篇</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2017/06/29/Unity中使用ProtoBuff3-0，与netty服务器通信的粘包、拆包处理（一）/" data-id="cj4i4iuww000020chu5r7ay93" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2017/06/29/Unity中使用ProtoBuff3-0，与netty服务器通信的粘包、拆包处理（二）/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          Unity中使用ProtoBuff3-0，与netty服务器通信的粘包、拆包处理（二）
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2017/06/21/晚上/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">晚上</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">June 2017</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2017/06/29/Unity中使用ProtoBuff3-0，与netty服务器通信的粘包、拆包处理（二）/">Unity中使用ProtoBuff3-0，与netty服务器通信的粘包、拆包处理（二）</a>
+          </li>
+        
+          <li>
+            <a href="/2017/06/29/Unity中使用ProtoBuff3-0，与netty服务器通信的粘包、拆包处理（一）/">Unity中使用ProtoBuff3-0，与netty服务器通信的粘包、拆包处理（一）</a>
+          </li>
+        
+          <li>
+            <a href="/2017/06/21/晚上/">晚上</a>
+          </li>
+        
+          <li>
+            <a href="/2017/06/21/C++中lambada变量捕获方式/">C++ lambada 变量捕获的几种方式</a>
+          </li>
+        
+          <li>
+            <a href="/2017/06/21/这是第一篇/">欢迎</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2017 hlw<br>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>
